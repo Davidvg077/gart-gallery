@@ -3,7 +3,7 @@ services:
     name: gart-gallery
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install --build-from-source=sqlite3
     startCommand: npm start
     disk:
       name: gart-gallery-data
@@ -12,6 +12,8 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
+      - key: npm_config_build_from_source
+        value: "true"
       - key: NODE_ENV
         value: production
       - key: DB_PATH
