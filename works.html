@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Works | Garth Low Fine Art</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">Garth Low Fine Art</a>
+
+    <button class="nav-toggle" aria-label="Open menu" aria-controls="mainMenu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="main-nav">
+      <ul id="mainMenu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="works.html" class="active">Works</a></li>
+        <li><a href="about.html">About the Artist</a></li>
+        <li><a href="contact.html">Contact the Artist</a></li>
+        <li><a href="galleries.html">Galleries</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="content-section">
+      <h1>Selected Works</h1>
+      <p>Explore our artwork organized by categories. You can browse each collection independently or manage the entire catalog from this panel.</p>
+
+      <div class="categories-nav">
+        <a href="works-landscape.html" class="category-card">
+          <h2>Landscape Paintings</h2>
+          <p>View full gallery &rarr;</p>
+        </a>
+        <a href="works-kootenay.html" class="category-card">
+          <h2>Kootenay Lake Paintings</h2>
+          <p>View full gallery &rarr;</p>
+        </a>
+        <a href="works-abstract-oil.html" class="category-card">
+          <h2>Abstract Oil Paintings</h2>
+          <p>View full gallery &rarr;</p>
+        </a>
+        <a href="works-abstract-watercolours.html" class="category-card">
+          <h2>Abstract Watercolours</h2>
+          <p>View full gallery &rarr;</p>
+        </a>
+        <a href="works-dogs.html" class="category-card">
+          <h2>Dogs</h2>
+          <p>View full gallery &rarr;</p>
+        </a>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="works-layout">
+        <section>
+          <h2 class="works-subtitle">All Works</h2>
+          <form id="worksSearchForm" class="works-toolbar">
+            <input id="worksSearchInput" name="q" type="search" placeholder="Search by title, description, or year">
+            <button type="submit">Search</button>
+          </form>
+
+          <div class="works-grid" id="worksList"></div>
+          <p id="worksEmpty" class="works-empty">No works published yet.</p>
+
+          <div class="works-pagination">
+            <button id="prevPageBtn" type="button" class="ghost-btn">Previous</button>
+            <p id="pageInfo" class="page-info">Page 1 of 1</p>
+            <button id="nextPageBtn" type="button" class="ghost-btn">Next</button>
+          </div>
+        </section>
+
+        
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal para Editar Work -->
+  <div id="editModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-content">
+      <h2 class="works-subtitle">Edit Work</h2>
+      <form id="editForm" class="admin-form" enctype="multipart/form-data">
+        <input id="editWorkId" type="hidden">
+
+        <label for="editTitle">Title</label>
+        <input id="editTitle" name="title" type="text" required>
+
+        <label for="editCategory">Category</label>
+        <select id="editCategory" name="category" required>
+          <option value="Landscape Paintings">Landscape Paintings</option>
+          <option value="Kootenay Lake Paintings">Kootenay Lake Paintings</option>
+          <option value="Abstract Oil Paintings">Abstract Oil Paintings</option>
+          <option value="Abstract Watercolours">Abstract Watercolours</option>
+          <option value="Dogs">Dogs</option>
+        </select>
+
+        <label for="editDescription">Description</label>
+        <textarea id="editDescription" name="description" rows="3"></textarea>
+
+        <label for="editYear">Year</label>
+        <input id="editYear" name="year" type="text">
+
+        <label for="editImage">Change Image (Optional)</label>
+        <input id="editImage" name="image" type="file" accept="image/*">
+
+        <div class="modal-actions">
+          <button type="submit">Save Changes</button>
+          <button id="closeModalBtn" type="button" class="ghost-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+  <!-- Artist Portal Modal -->
+  <div id="adminPortalModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-content">
+      <h2 class="works-subtitle">Artist Portal</h2>
+      <p class="admin-note">Sign in to manage and upload artworks.</p>
+
+      <form id="adminLoginForm" class="admin-form">
+        <label for="adminUser">Username</label>
+        <input id="adminUser" name="username" type="text" required>
+
+        <label for="adminPassword">Password</label>
+        <input id="adminPassword" name="password" type="password" required>
+
+        <div class="modal-actions">
+          <button type="submit">Sign In</button>
+          <button type="button" class="ghost-btn close-admin-portal-btn">Cancel</button>
+        </div>
+      </form>
+
+      <div id="uploadPanel" class="hidden">
+        <form id="uploadForm" class="admin-form" enctype="multipart/form-data">
+          <label for="workTitle">Title</label>
+          <input id="workTitle" name="title" type="text" required>
+
+          <label for="workCategory">Category</label>
+          <select id="workCategory" name="category" required>
+            <option value="Landscape Paintings">Landscape Paintings</option>
+            <option value="Kootenay Lake Paintings">Kootenay Lake Paintings</option>
+            <option value="Abstract Oil Paintings">Abstract Oil Paintings</option>
+            <option value="Abstract Watercolours">Abstract Watercolours</option>
+            <option value="Dogs">Dogs</option>
+          </select>
+
+          <label for="workDescription">Description</label>
+          <textarea id="workDescription" name="description" rows="3"></textarea>
+
+          <label for="workYear">Year</label>
+          <input id="workYear" name="year" type="text" placeholder="2026">
+
+          <label for="workImage">Image</label>
+          <input id="workImage" name="image" type="file" accept="image/*" required>
+
+          <div class="modal-actions">
+            <button type="submit">Upload Work</button>
+            <button type="button" class="ghost-btn close-admin-portal-btn">Close</button>
+          </div>
+        </form>
+
+        <button id="logoutBtn" type="button" class="ghost-btn" style="margin-top: 10px;">Sign Out</button>
+      </div>
+
+      <p id="authStatus" class="auth-status"></p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Garth Low Fine Art. All rights reserved.</p>
+    <a href="contact.html">Book a private viewing</a> | <a href="#" class="open-artist-portal-link" class="artist-login-link">Artist Portal</a>
+  </footer>
+
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/works.js"></script>
+</body>
+</html>

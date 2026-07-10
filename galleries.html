@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galleries | Garth Low Fine Art</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">Garth Low Fine Art</a>
+
+    <button class="nav-toggle" aria-label="Open menu" aria-controls="mainMenu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="main-nav">
+      <ul id="mainMenu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="works.html">Works</a></li>
+        <li><a href="about.html">About the Artist</a></li>
+        <li><a href="contact.html">Contact the Artist</a></li>
+        <li><a href="galleries.html" class="active">Galleries</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="content-section">
+      <h1>Partner Galleries</h1>
+      <p>Placeholder list of represented spaces. You can replace each entry with real addresses, links, and schedules.</p>
+
+      <div class="content-grid">
+        <article class="content-card">
+          <h2>Northlight Gallery</h2>
+          <p>Madrid, Spain</p>
+        </article>
+        <article class="content-card">
+          <h2>Harbor Contemporary</h2>
+          <p>Lisbon, Portugal</p>
+        </article>
+        <article class="content-card">
+          <h2>Room 12 Art Space</h2>
+          <p>Barcelona, Spain</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  
+  <!-- Artist Portal Modal -->
+  <div id="adminPortalModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-content">
+      <h2 class="works-subtitle">Artist Portal</h2>
+      <p class="admin-note">Sign in to manage and upload artworks.</p>
+
+      <form id="adminLoginForm" class="admin-form">
+        <label for="adminUser">Username</label>
+        <input id="adminUser" name="username" type="text" required>
+
+        <label for="adminPassword">Password</label>
+        <input id="adminPassword" name="password" type="password" required>
+
+        <div class="modal-actions">
+          <button type="submit">Sign In</button>
+          <button type="button" class="ghost-btn close-admin-portal-btn">Cancel</button>
+        </div>
+      </form>
+
+      <div id="uploadPanel" class="hidden">
+        <form id="uploadForm" class="admin-form" enctype="multipart/form-data">
+          <label for="workTitle">Title</label>
+          <input id="workTitle" name="title" type="text" required>
+
+          <label for="workCategory">Category</label>
+          <select id="workCategory" name="category" required>
+            <option value="Landscape Paintings">Landscape Paintings</option>
+            <option value="Kootenay Lake Paintings">Kootenay Lake Paintings</option>
+            <option value="Abstract Oil Paintings">Abstract Oil Paintings</option>
+            <option value="Abstract Watercolours">Abstract Watercolours</option>
+            <option value="Dogs">Dogs</option>
+          </select>
+
+          <label for="workDescription">Description</label>
+          <textarea id="workDescription" name="description" rows="3"></textarea>
+
+          <label for="workYear">Year</label>
+          <input id="workYear" name="year" type="text" placeholder="2026">
+
+          <label for="workImage">Image</label>
+          <input id="workImage" name="image" type="file" accept="image/*" required>
+
+          <div class="modal-actions">
+            <button type="submit">Upload Work</button>
+            <button type="button" class="ghost-btn close-admin-portal-btn">Close</button>
+          </div>
+        </form>
+
+        <button id="logoutBtn" type="button" class="ghost-btn" style="margin-top: 10px;">Sign Out</button>
+      </div>
+
+      <p id="authStatus" class="auth-status"></p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Garth Low Fine Art. All rights reserved.</p>
+    <a href="contact.html">Book a private viewing</a> | <a href="#" class="open-artist-portal-link" class="artist-login-link">Artist Portal</a>
+  </footer>
+
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/works.js"></script>
+</body>
+</html>

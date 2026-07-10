@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery Management Dashboard | Garth Low Fine Art</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/admin-dashboard.css">
+</head>
+<body class="admin-dashboard-body">
+
+  <header class="admin-header">
+    <div class="admin-header-left">
+      <a href="index.html" class="logo" style="font-size: 1.6rem;">Garth Low Fine Art</a>
+      <span class="admin-badge">Management Dashboard</span>
+    </div>
+    <div class="admin-header-right">
+      <a href="works.html" class="ghost-btn" style="width: auto; padding: 6px 14px; font-size: 0.75rem;">View Live Gallery</a>
+      <button id="dashboardLogoutBtn" type="button" class="ghost-btn" style="width: auto; padding: 6px 14px; font-size: 0.75rem;">Sign Out</button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <!-- Category Tabs -->
+    <nav class="admin-tabs">
+      <button class="tab-btn active" data-category="All">All Categories</button>
+      <button class="tab-btn" data-category="Landscape Paintings">Landscape Paintings</button>
+      <button class="tab-btn" data-category="Kootenay Lake Paintings">Kootenay Lake Paintings</button>
+      <button class="tab-btn" data-category="Abstract Oil Paintings">Abstract Oil Paintings</button>
+      <button class="tab-btn" data-category="Abstract Watercolours">Abstract Watercolours</button>
+      <button class="tab-btn" data-category="Dogs">Dogs</button>
+    </nav>
+
+    <div class="admin-content-header">
+      <div class="admin-title-area">
+        <h1 id="activeCategoryTitle">All Categories</h1>
+        <p id="activeCategoryCount">Loading works...</p>
+      </div>
+      <button id="openNewWorkModalBtn" class="primary-btn">+ Upload New Artwork</button>
+    </div>
+
+    <form id="dashboardSearchForm" class="works-toolbar" style="max-width: 500px; margin-bottom: 24px;">
+      <input id="dashboardSearchInput" name="q" type="search" placeholder="Search works in current view...">
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- Works Table / Grid -->
+    <div id="adminWorksGrid" class="admin-works-grid"></div>
+    <p id="adminWorksEmpty" class="works-empty hidden">No works found in this category.</p>
+
+    <!-- Pagination -->
+    <div class="works-pagination" style="margin-top: 30px;">
+      <button id="adminPrevPageBtn" type="button" class="ghost-btn">Previous</button>
+      <p id="adminPageInfo" class="page-info">Page 1 of 1</p>
+      <button id="adminNextPageBtn" type="button" class="ghost-btn">Next</button>
+    </div>
+  </main>
+
+  <!-- Upload New Artwork Modal -->
+  <div id="newWorkModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-content">
+      <h2 class="works-subtitle">Upload New Artwork</h2>
+      <form id="newWorkForm" class="admin-form" enctype="multipart/form-data">
+        <label for="newTitle">Title</label>
+        <input id="newTitle" name="title" type="text" required>
+
+        <label for="newCategory">Category</label>
+        <select id="newCategory" name="category" required>
+          <option value="Landscape Paintings">Landscape Paintings</option>
+          <option value="Kootenay Lake Paintings">Kootenay Lake Paintings</option>
+          <option value="Abstract Oil Paintings">Abstract Oil Paintings</option>
+          <option value="Abstract Watercolours">Abstract Watercolours</option>
+          <option value="Dogs">Dogs</option>
+        </select>
+
+        <label for="newDescription">Description</label>
+        <textarea id="newDescription" name="description" rows="3"></textarea>
+
+        <label for="newYear">Year</label>
+        <input id="newYear" name="year" type="text" placeholder="2026">
+
+        <label for="newImage">Image File</label>
+        <input id="newImage" name="image" type="file" accept="image/*" required>
+
+        <div class="modal-actions">
+          <button type="submit" class="primary-btn">Upload Work</button>
+          <button type="button" class="ghost-btn close-new-work-modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Artwork Modal -->
+  <div id="dashboardEditModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-content">
+      <h2 class="works-subtitle">Edit Artwork</h2>
+      <form id="dashboardEditForm" class="admin-form" enctype="multipart/form-data">
+        <input id="dashEditWorkId" type="hidden">
+
+        <label for="dashEditTitle">Title</label>
+        <input id="dashEditTitle" name="title" type="text" required>
+
+        <label for="dashEditCategory">Category</label>
+        <select id="dashEditCategory" name="category" required>
+          <option value="Landscape Paintings">Landscape Paintings</option>
+          <option value="Kootenay Lake Paintings">Kootenay Lake Paintings</option>
+          <option value="Abstract Oil Paintings">Abstract Oil Paintings</option>
+          <option value="Abstract Watercolours">Abstract Watercolours</option>
+          <option value="Dogs">Dogs</option>
+        </select>
+
+        <label for="dashEditDescription">Description</label>
+        <textarea id="dashEditDescription" name="description" rows="3"></textarea>
+
+        <label for="dashEditYear">Year</label>
+        <input id="dashEditYear" name="year" type="text">
+
+        <label for="dashEditImage">Change Image (Optional)</label>
+        <input id="dashEditImage" name="image" type="file" accept="image/*">
+
+        <div class="modal-actions">
+          <button type="submit" class="primary-btn">Save Changes</button>
+          <button type="button" class="ghost-btn close-dash-edit-modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/admin-dashboard.js"></script>
+</body>
+</html>
