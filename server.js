@@ -70,54 +70,159 @@ if (DATABASE_URL) {
     }
   };
 } else {
-  const sqlite3 = require('sqlite3').verbose();
-  const dbPath = process.env.DB_PATH || path.join(__dirname, 'data', 'gallery.db');
-  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  const sqliteDb = new sqlite3.Database(dbPath);
+  const dataPath = process.env.DB_PATH || path.join(__dirname, 'data', 'gallery.json');
+  fs.mkdirSync(path.dirname(dataPath), { recursive: true });
+
+  const state = {
+    works: [],
+    nextId: 1
+  };
+
+  function loadState() {
+    if (!fs.existsSync(dataPath)) {
+      return;
+    }
+    try {
+      const raw = fs.readFileSync(dataPath, 'utf8');
+      if (!raw.trim()) {
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.works)) {
+        state.works = parsed.works;
+      }
+      if (Number.isInteger(parsed.nextId) && parsed.nextId > 0) {
+        state.nextId = parsed.nextId;
+      } else {
+        const maxId = state.works.reduce((max, row) => Math.max(max, Number(row.id) || 0), 0);
+        state.nextId = maxId + 1;
+      }
+    } catch (error) {
+      console.error('Error reading local data file:', error);
+    }
+  }
+
+  function saveState() {
+    const payload = JSON.stringify(state, null, 2);
+    fs.writeFileSync(dataPath, payload, 'utf8');
+  }
+
+  function applyFilters(rows, params, hasCategoryFilter = false) {
+    let index = 0;
+    let filtered = [...rows];
+
+    if (params.length >= 3) {
+      const rawQuery = String(params[index] || '');
+      if (rawQuery.includes('%')) {
+        const q = rawQuery.replace(/%/g, '').toLowerCase();
+        if (q) {
+          filtered = filtered.filter((row) => {
+            const title = String(row.title || '').toLowerCase();
+            const description = String(row.description || '').toLowerCase();
+            const year = String(row.year || '').toLowerCase();
+            return title.includes(q) || description.includes(q) || year.includes(q);
+          });
+        }
+        index += 3;
+      }
+    }
+
+    const remaining = params.slice(index);
+    if (hasCategoryFilter && remaining.length > 0 && typeof remaining[0] === 'string' && remaining[0].trim()) {
+      const category = remaining[0].trim();
+      filtered = filtered.filter((row) => String(row.category || '') === category);
+    }
+
+    return filtered;
+  }
 
   dbBackend = {
-    type: 'sqlite',
+    type: 'json',
     init: async () => {
-      return new Promise((resolve, reject) => {
-        sqliteDb.run(`
-          CREATE TABLE IF NOT EXISTS works (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            description TEXT,
-            year TEXT,
-            category TEXT DEFAULT 'Landscape Paintings',
-            image_path TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-          )
-        `, (err) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          sqliteDb.run("ALTER TABLE works ADD COLUMN category TEXT DEFAULT 'Landscape Paintings'", () => {
-            resolve();
-          });
-        });
-      });
+      loadState();
+      saveState();
     },
-    all: (sql, params = []) => new Promise((resolve, reject) => {
-      sqliteDb.all(sql, params, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    }),
-    get: (sql, params = []) => new Promise((resolve, reject) => {
-      sqliteDb.get(sql, params, (err, row) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    }),
-    run: (sql, params = []) => new Promise((resolve, reject) => {
-      sqliteDb.run(sql, params, function runCallback(err) {
-        if (err) reject(err);
-        else resolve({ lastID: this.lastID, changes: this.changes });
-      });
-    })
+    all: async (sql, params = []) => {
+      if (/SELECT\s+id,\s*title,\s*description,\s*year,\s*category,\s*image_path,\s*created_at\s+FROM\s+works/i.test(sql)) {
+        const hasCategoryFilter = /category\s*=\s*(\?|\$\d+)/i.test(sql);
+        const rows = applyFilters(state.works, params, hasCategoryFilter)
+          .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
+
+        const limit = Number(params[params.length - 2] || rows.length);
+        const offset = Number(params[params.length - 1] || 0);
+        return rows.slice(offset, offset + limit);
+      }
+      return [];
+    },
+    get: async (sql, params = []) => {
+      if (/SELECT\s+COUNT\(\*\)\s+AS\s+total\s+FROM\s+works/i.test(sql)) {
+        const hasCategoryFilter = /category\s*=\s*(\?|\$\d+)/i.test(sql);
+        const rows = applyFilters(state.works, params, hasCategoryFilter);
+        return { total: rows.length };
+      }
+
+      if (/SELECT\s+id,\s*image_path\s+FROM\s+works\s+WHERE\s+id\s*=\s*\?/i.test(sql)) {
+        const id = Number(params[0]);
+        const row = state.works.find((item) => item.id === id);
+        return row ? { id: row.id, image_path: row.image_path } : undefined;
+      }
+
+      if (/SELECT\s+id,\s*title,\s*description,\s*year,\s*category,\s*image_path,\s*created_at\s+FROM\s+works\s+WHERE\s+id\s*=\s*\?/i.test(sql)) {
+        const id = Number(params[0]);
+        return state.works.find((item) => item.id === id);
+      }
+
+      return undefined;
+    },
+    run: async (sql, params = []) => {
+      if (/INSERT\s+INTO\s+works/i.test(sql)) {
+        const [title, description, year, category, imagePath] = params;
+        const row = {
+          id: state.nextId++,
+          title,
+          description,
+          year,
+          category,
+          image_path: imagePath,
+          created_at: new Date().toISOString()
+        };
+        state.works.push(row);
+        saveState();
+        return { lastID: row.id, changes: 1 };
+      }
+
+      if (/UPDATE\s+works\s+SET/i.test(sql)) {
+        const [title, description, year, category, imagePath, idParam] = params;
+        const id = Number(idParam);
+        const index = state.works.findIndex((item) => item.id === id);
+        if (index === -1) {
+          return { lastID: null, changes: 0 };
+        }
+        state.works[index] = {
+          ...state.works[index],
+          title,
+          description,
+          year,
+          category,
+          image_path: imagePath
+        };
+        saveState();
+        return { lastID: null, changes: 1 };
+      }
+
+      if (/DELETE\s+FROM\s+works\s+WHERE\s+id\s*=\s*\?/i.test(sql)) {
+        const id = Number(params[0]);
+        const before = state.works.length;
+        state.works = state.works.filter((item) => item.id !== id);
+        const changes = before - state.works.length;
+        if (changes > 0) {
+          saveState();
+        }
+        return { lastID: null, changes };
+      }
+
+      return { lastID: null, changes: 0 };
+    }
   };
 }
 
