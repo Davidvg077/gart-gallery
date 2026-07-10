@@ -8,6 +8,7 @@ const session = require('express-session');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+const isProduction = process.env.NODE_ENV === 'production';
 
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
@@ -165,15 +166,22 @@ const upload = multer({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Render terminates TLS at the proxy, so Express must trust proxy headers.
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
+
 app.use(session({
   name: 'gart.sid',
   secret: process.env.SESSION_SECRET || 'change-this-session-secret',
   resave: false,
   saveUninitialized: false,
+  proxy: isProduction,
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProduction ? 'auto' : false,
     maxAge: 1000 * 60 * 60 * 12
   }
 }));
